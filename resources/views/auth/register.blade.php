@@ -78,7 +78,7 @@
                     id="password"
                     type="password"
                     name="password"
-                    placeholder="Minimal 8 karakter"
+                    placeholder="Masukan Password"
                     required
                     autocomplete="new-password"
                     class="form-input has-action"
