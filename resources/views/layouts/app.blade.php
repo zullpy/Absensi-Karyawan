@@ -8,7 +8,9 @@
         <title>{{ $title ?? config('app.name', 'Aplikasi Absensi') }}</title>
 
         <!-- Favicon -->
-        <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+        <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48" type="image/x-icon">
+        <link rel="icon" href="{{ asset('images/logo/logo-hadirin.png') }}" sizes="any" type="image/png">
+        <link rel="apple-touch-icon" href="{{ asset('images/logo/logo-hadirin.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -16,6 +18,26 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Theme Initialization -->
+        <script>
+            (function () {
+                var saved = localStorage.getItem('hadirin-theme');
+                if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            })();
+        </script>
+
+        <!-- SweetAlert2 -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+        <!-- Cropper.js for Profile Photo Editor -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
     </head>
     <body class="font-sans antialiased">
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -31,9 +53,10 @@
             @endisset
 
             <!-- Page Content -->
-            <main>
+            <main class="pb-16 sm:pb-0">
                 {{ $slot }}
             </main>
         </div>
+        @stack('scripts')
     </body>
 </html>

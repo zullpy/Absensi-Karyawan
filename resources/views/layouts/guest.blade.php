@@ -9,7 +9,9 @@
         <title>{{ $title ?? config('app.name', 'HADIRin - Absensi dari Genggaman') }}</title>
 
         <!-- Favicon -->
-        <link rel="icon" href="{{ asset('favicon.ico') }}" type="image/x-icon">
+        <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48" type="image/x-icon">
+        <link rel="icon" href="{{ asset('images/logo/logo-hadirin.png') }}" sizes="any" type="image/png">
+        <link rel="apple-touch-icon" href="{{ asset('images/logo/logo-hadirin.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -374,7 +376,7 @@
 
             <!-- Footer -->
             <footer class="guest-footer">
-                &copy; {{ date('Y') }} HADIRin &mdash; Semua hak dilindungi
+                &copy; {{ date('Y') }} HADIRin &mdash; Created by Muhammad Zulfahmi
             </footer>
         </div>
 

@@ -156,11 +156,10 @@ class OtpPasswordResetController extends Controller
         }
 
         $request->validate([
-            'password' => ['required', 'confirmed', 'min:8'],
+            'password' => ['required', 'confirmed'],
         ], [
             'password.required'  => 'Password baru wajib diisi.',
             'password.confirmed' => 'Konfirmasi password tidak cocok.',
-            'password.min'       => 'Password minimal 8 karakter.',
         ]);
 
         $no_hp = $request->session()->get('otp_no_hp');
