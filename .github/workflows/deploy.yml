@@ -17,6 +17,11 @@ jobs:
         port: ${{ secrets.HOSTINGER_PORT }}
         script: |
           cd ${{ secrets.HOSTINGER_PATH }}
+          # Cek apakah folder sudah git repository
+          if [ ! -d .git ]; then
+            git init
+            git remote add origin https://github.com/zullpy/Absensi-Karyawan.git
+          fi
           git pull origin main
           composer install --no-dev --optimize-autoloader
           php artisan migrate --force
