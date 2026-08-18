@@ -1,72 +1,15 @@
 <x-guest-layout>
     <div class="card-header">
-        <h1>Buat Akun Baru</h1>
-        <p>Daftarkan diri Anda untuk menggunakan sistem absensi</p>
+        <h1>Buat Password Baru</h1>
+        <p>Masukkan password baru Anda. Minimal 8 karakter.</p>
     </div>
 
-    <form method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('password.otp.reset.post') }}">
         @csrf
 
-        {{-- Username --}}
+        {{-- Password Baru --}}
         <div class="form-group">
-            <label for="username">Username</label>
-            <div class="input-wrap">
-                <span class="input-icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                </span>
-                <input
-                    id="username"
-                    type="text"
-                    name="username"
-                    value="{{ old('username') }}"
-                    placeholder="Masukkan username"
-                    required
-                    autofocus
-                    autocomplete="username"
-                    class="form-input"
-                >
-            </div>
-            @error('username')
-                <p class="error-text">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
-                    {{ $message }}
-                </p>
-            @enderror
-        </div>
-
-        {{-- No. HP --}}
-        <div class="form-group">
-            <label for="no_hp">Nomor HP</label>
-            <div class="input-wrap">
-                <span class="input-icon">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                    </svg>
-                </span>
-                <input
-                    id="no_hp"
-                    type="tel"
-                    name="no_hp"
-                    value="{{ old('no_hp') }}"
-                    placeholder="Contoh: 08123456789"
-                    required
-                    autocomplete="tel"
-                    class="form-input"
-                >
-            </div>
-            @error('no_hp')
-                <p class="error-text">
-                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
-                    {{ $message }}
-                </p>
-            @enderror
-        </div>
-
-        {{-- Password --}}
-        <div class="form-group">
-            <label for="password">Password</label>
+            <label for="password">Password Baru</label>
             <div class="input-wrap">
                 <span class="input-icon">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -80,10 +23,11 @@
                     name="password"
                     placeholder="Minimal 8 karakter"
                     required
+                    autofocus
                     autocomplete="new-password"
                     class="form-input has-action"
                 >
-                <button type="button" class="input-action" id="togglePassword" aria-label="Tampilkan password">
+                <button type="button" class="input-action" id="togglePw" aria-label="Tampilkan password">
                     <svg id="eyeOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -114,7 +58,7 @@
                     id="password_confirmation"
                     type="password"
                     name="password_confirmation"
-                    placeholder="Ulangi password"
+                    placeholder="Ulangi password baru"
                     required
                     autocomplete="new-password"
                     class="form-input"
@@ -128,26 +72,19 @@
             @enderror
         </div>
 
-        {{-- Submit --}}
-        <button type="submit" class="btn-login" id="registerBtn">
+        <button type="submit" class="btn-login" id="btnReset">
             <span class="btn-login-inner">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                 </svg>
-                Daftar Sekarang
+                Simpan Password Baru
             </span>
         </button>
-
-        <div style="text-align: center; margin-top: 16px;">
-            <a href="{{ route('login') }}" class="forgot-link">
-                Sudah punya akun? Masuk di sini
-            </a>
-        </div>
     </form>
 
     <script>
         (function () {
-            var btn = document.getElementById('togglePassword');
+            var btn = document.getElementById('togglePw');
             var pw  = document.getElementById('password');
             var e1  = document.getElementById('eyeOpen');
             var e2  = document.getElementById('eyeClosed');
