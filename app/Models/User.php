@@ -12,12 +12,28 @@ use Illuminate\Notifications\Notifiable;
 
 use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['username', 'no_hp', 'profile_photo', 'password'])]
+#[Fillable(['username', 'no_hp', 'profile_photo', 'password', 'role'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    /**
+     * Check if user is admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Check if user is regular user.
+     */
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
 
     /**
      * Get the attributes that should be cast.
