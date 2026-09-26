@@ -16,9 +16,21 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    @if (Auth::user()->isUser())
+                        <x-nav-link :href="route('user.attendance.history')" :active="request()->routeIs('user.attendance.history')">
+                            {{ __('Riwayat Absen') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('user.leaves.create')" :active="request()->routeIs('user.leaves.create')">
+                            {{ __('Ajukan Izin') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('user.leaves.history')" :active="request()->routeIs('user.leaves.history')">
+                            {{ __('Riwayat Izin') }}
+                        </x-nav-link>
+                    @endif
+
                     @if (Auth::user()->isAdmin())
-
-
                         <x-nav-link :href="route('admin.absensi')" :active="request()->routeIs('admin.absensi*')">
                             {{ __('Absensi') }}
                         </x-nav-link>
@@ -45,18 +57,23 @@
                                     </div>
 
                                     <!-- Divisi -->
-                                    <a href="{{ route('admin.master.divisi') }}" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700/60 hover:text-blue-600 dark:hover:text-blue-400 transition rounded-xl mx-1.5 {{ request()->routeIs('admin.master.divisi') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-gray-700/60 font-semibold' : '' }}">
+                                    <a href="{{ route('admin.master.divisi') }}" class="flex items-center gap-2.5 mb-1.5 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700/60 hover:text-blue-600 dark:hover:text-blue-400 transition rounded-xl mx-1.5 {{ request()->routeIs('admin.master.divisi') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-gray-700/60 font-semibold' : '' }}">
                                         <span>Divisi</span>
                                     </a>
 
                                     <!-- Data Admin -->
-                                    <a href="{{ route('admin.master.admin') }}" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700/60 hover:text-blue-600 dark:hover:text-blue-400 transition rounded-xl mx-1.5 {{ request()->routeIs('admin.master.admin') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-gray-700/60 font-semibold' : '' }}">
+                                    <a href="{{ route('admin.master.admin') }}" class="flex items-center gap-2.5 mb-1.5 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700/60 hover:text-blue-600 dark:hover:text-blue-400 transition rounded-xl mx-1.5 {{ request()->routeIs('admin.master.admin') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-gray-700/60 font-semibold' : '' }}">
                                         <span>Data Admin</span>
                                     </a>
 
                                     <!-- Data User -->
-                                    <a href="{{ route('admin.master.user') }}" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700/60 hover:text-blue-600 dark:hover:text-blue-400 transition rounded-xl mx-1.5 {{ request()->routeIs('admin.master.user') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-gray-700/60 font-semibold' : '' }}">
+                                    <a href="{{ route('admin.master.user') }}" class="flex items-center gap-2.5 mb-1.5 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700/60 hover:text-blue-600 dark:hover:text-blue-400 transition rounded-xl mx-1.5 {{ request()->routeIs('admin.master.user') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-gray-700/60 font-semibold' : '' }}">
                                         <span>Data User</span>
+                                    </a>
+
+                                    <!-- Titik Lokasi Kantor -->
+                                    <a href="{{ route('admin.master.lokasi-kantor') }}" class="flex items-center gap-2.5 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700/60 hover:text-blue-600 dark:hover:text-blue-400 transition rounded-xl mx-1.5 {{ request()->routeIs('admin.master.lokasi-kantor') ? 'text-blue-600 dark:text-blue-400 bg-blue-50/80 dark:bg-gray-700/60 font-semibold' : '' }}">
+                                        <span>Titik Lokasi Kantor</span>
                                     </a>
                                 </x-slot>
                             </x-dropdown>
@@ -196,6 +213,18 @@
                     <div class="text-[11px] text-gray-500 dark:text-gray-400">Master akun karyawan / user</div>
                 </div>
             </a>
+            <a href="{{ route('admin.master.lokasi-kantor') }}" class="flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700/60 {{ request()->routeIs('admin.master.lokasi-kantor') ? 'bg-blue-50 dark:bg-gray-700/60 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300' }}">
+                <div class="w-8 h-8 rounded-lg bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+                <div class="text-left">
+                    <div class="text-sm font-semibold">Titik Lokasi Kantor</div>
+                    <div class="text-[11px] text-gray-500 dark:text-gray-400">Pengaturan koordinat GPS & radius</div>
+                </div>
+            </a>
         </div>
     </div>
 
@@ -211,6 +240,49 @@
         </span>
         <span class="bottom-nav-label">Dashboard</span>
     </a>
+
+    @if (Auth::user()->isUser())
+        {{-- Riwayat Absen --}}
+        <a href="{{ route('user.attendance.history') }}"
+           class="bottom-nav-item {{ request()->routeIs('user.attendance.history') ? 'active' : '' }}"
+           id="bnav-history">
+            <span class="bottom-nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </span>
+            <span class="bottom-nav-label">Riwayat</span>
+        </a>
+
+        {{-- Ajukan Izin --}}
+        <a href="{{ route('user.leaves.create') }}"
+           class="bottom-nav-item {{ request()->routeIs('user.leaves.create') ? 'active' : '' }}"
+           id="bnav-ajukan-izin">
+            <span class="bottom-nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+            </span>
+            <span class="bottom-nav-label">Ajukan Izin</span>
+        </a>
+
+        {{-- Riwayat Izin --}}
+        <a href="{{ route('user.leaves.history') }}"
+           class="bottom-nav-item {{ request()->routeIs('user.leaves.history') ? 'active' : '' }}"
+           id="bnav-riwayat-izin">
+            <span class="bottom-nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+            </span>
+            <span class="bottom-nav-label">Status Izin</span>
+        </a>
+    @endif
 
     @if (Auth::user()->isAdmin())
         {{-- Master Data Trigger --}}
