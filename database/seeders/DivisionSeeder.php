@@ -13,11 +13,30 @@ class DivisionSeeder extends Seeder
     public function run(): void
     {
         $divisions = [
-            ['name' => 'IT & Development', 'description' => 'Departemen pengembangan sistem, perangkat lunak dan infrastruktur IT'],
-            ['name' => 'Human Resources (HRD)', 'description' => 'Departemen pengelolaan sumber daya manusia, absensi dan rekrutmen'],
-            ['name' => 'Keuangan & Akuntansi', 'description' => 'Departemen perencanaan anggaran, pembukuan dan kas keuangan'],
-            ['name' => 'Pemasaran & Bisnis', 'description' => 'Departemen strategi branding, promosi dan kemitraan bisnis'],
-            ['name' => 'Operasional', 'description' => 'Departemen pengelolaan kegiatan operasional harian kantor'],
+            [
+                'name' => 'Petugas Logistik / Pengadaan',
+                'description' => 'Menerima bahan baku dari pemasok, memeriksa kualitas bahan, dan mengelola tempat penyimpanan (dry/cold storage).',
+            ],
+            [
+                'name' => 'Petugas Persiapan Bahan',
+                'description' => 'Mencuci, memotong, dan meracik bahan makanan mentah sebelum dimasak sesuai takaran.',
+            ],
+            [
+                'name' => 'Juru Masak Utama & Anggota (Chef/Koki)',
+                'description' => 'Mengolah dan memasak makanan dalam jumlah besar sesuai resep dan standar higienitas',
+            ],
+            [
+                'name' => 'Petugas Pemorsian',
+                'description' => 'Menimbang dan menakar porsi makanan matang ke dalam wadah secara presisi sesuai standar gizi.',
+            ],
+            [
+                'name' => 'Petugas Distribusi',
+                'description' => 'Mengantar paket makanan bergizi ke satuan pendidikan atau titik sasaran tepat waktu dan mengambil kembali perlengkapan kosong.',
+            ],
+            [
+                'name' => 'Petugas Kebersihan dan Sanitasi',
+                'description' => 'Menjaga kebersihan area dapur, mencuci peralatan makan/masak, dan mengelola limbah untuk mencegah kontaminasi.',
+            ],
         ];
 
         foreach ($divisions as $d) {

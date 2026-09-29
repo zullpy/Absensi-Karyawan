@@ -12,7 +12,7 @@ self.addEventListener('activate', function(event) {
 // Tangkap Push Event dari Server (bahkan ketika browser/tab sedang ditutup)
 self.addEventListener('push', function(event) {
     let data = {
-        title: '⏰ Peringatan Absensi',
+        title: '!!! Peringatan Absensi !!!',
         body: 'Waktu absensi akan segera berakhir!',
         url: '/'
     };
@@ -25,7 +25,7 @@ self.addEventListener('push', function(event) {
         }
     }
 
-    const title = data.title || '⏰ Peringatan Absensi';
+    const title = data.title || '!!! Peringatan Absensi !!!';
     const body = data.body || 'Waktu absensi akan segera berakhir!';
     const rawUrl = data.url || '/';
 
@@ -46,7 +46,7 @@ self.addEventListener('push', function(event) {
             body: body
         },
         actions: [
-            { action: 'open', title: '📸 Buka Absensi' },
+            { action: 'open', title: 'Buka Absensi' },
             { action: 'dismiss', title: 'Tutup' }
         ]
     };
