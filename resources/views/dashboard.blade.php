@@ -835,9 +835,9 @@
                         const existingSub = await reg.pushManager.getSubscription();
 
                         if (Notification.permission === 'granted') {
-                            this.pushEnabled = true;
-                            // Pastikan backend selalu sinkron dengan subscription & contentEncoding terbaru
-                            await this.doSubscribePush(reg);
+                            // Sinkronkan ke database server terlebih dahulu
+                            const subscribed = await this.doSubscribePush(reg);
+                            this.pushEnabled = !!subscribed;
                             return;
                         }
 
@@ -846,7 +846,8 @@
                             try {
                                 const perm = await Notification.requestPermission();
                                 if (perm === 'granted') {
-                                    await this.doSubscribePush(reg);
+                                    const subscribed = await this.doSubscribePush(reg);
+                                    this.pushEnabled = !!subscribed;
                                 }
                             } catch (e) {
                                 console.warn('Auto notification prompt blocked by browser:', e);
@@ -859,7 +860,8 @@
                                         const p = await Notification.requestPermission();
                                         if (p === 'granted') {
                                             const r = await navigator.serviceWorker.ready;
-                                            await this.doSubscribePush(r);
+                                            const subscribed = await this.doSubscribePush(r);
+                                            this.pushEnabled = !!subscribed;
                                         }
                                     } catch (err) {}
                                 }
@@ -877,15 +879,41 @@
                 async doSubscribePush(reg) {
                     try {
                         const keyRes = await fetch('{{ route("push.key") }}');
+                        if (!keyRes.ok) {
+                            console.error('Gagal mengambil VAPID Public Key dari server (HTTP ' + keyRes.status + ')');
+                            return false;
+                        }
                         const keyData = await keyRes.json();
+                        if (!keyData.publicKey) {
+                            console.error('VAPID_PUBLIC_KEY belum disetel di .env server production!');
+                            return false;
+                        }
+
                         const convertedKey = this.urlBase64ToUint8Array(keyData.publicKey);
 
                         let subscription = await reg.pushManager.getSubscription();
+                        
+                        // Coba buat subscription baru jika belum ada
                         if (!subscription) {
-                            subscription = await reg.pushManager.subscribe({
-                                userVisibleOnly: true,
-                                applicationServerKey: convertedKey
-                            });
+                            try {
+                                subscription = await reg.pushManager.subscribe({
+                                    userVisibleOnly: true,
+                                    applicationServerKey: convertedKey
+                                });
+                            } catch (subErr) {
+                                console.warn('Gagal subscribe awal, coba unsubscribe subscription lama jika ada:', subErr);
+                                const oldSub = await reg.pushManager.getSubscription();
+                                if (oldSub) await oldSub.unsubscribe();
+                                subscription = await reg.pushManager.subscribe({
+                                    userVisibleOnly: true,
+                                    applicationServerKey: convertedKey
+                                });
+                            }
+                        }
+
+                        if (!subscription) {
+                            console.error('Push subscription gagal dibuat oleh browser.');
+                            return false;
                         }
 
                         const subJson = subscription.toJSON();
@@ -905,9 +933,14 @@
                         const res = await response.json();
                         if (res.success) {
                             this.pushEnabled = true;
+                            return true;
+                        } else {
+                            console.error('Server push.subscribe returned false:', res.message);
+                            return false;
                         }
                     } catch (e) {
                         console.error('doSubscribePush error:', e);
+                        return false;
                     }
                 },
 
@@ -937,13 +970,22 @@
                         const permission = await Notification.requestPermission();
                         if (permission === 'granted') {
                             const reg = await navigator.serviceWorker.ready;
-                            await this.doSubscribePush(reg);
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Notifikasi Aktif!',
-                                text: 'Sistem akan mengirimkan notifikasi pengingat 15 menit sebelum batas waktu absen masuk (08:15 WIB), bahkan saat browser ditutup.',
-                                confirmButtonColor: '#2563eb'
-                            });
+                            const subscribed = await this.doSubscribePush(reg);
+                            if (subscribed) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Notifikasi Aktif!',
+                                    text: 'Sistem akan mengirimkan notifikasi pengingat 15 menit sebelum batas waktu absen masuk (08:15 WIB), bahkan saat browser ditutup.',
+                                    confirmButtonColor: '#2563eb'
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'warning',
+                                    title: 'Izin Diberikan, Tapi Gagal Sinkron ke Server',
+                                    html: '<p class="text-xs text-left">Browser sudah memberi izin, tetapi server belum berhasil menyimpan token perangkat Anda.<br><br><b>Kemungkinan penyebab di Production:</b><br>1. Kunci <code>VAPID_PUBLIC_KEY</code> & <code>VAPID_PRIVATE_KEY</code> belum diset di <code>.env</code> server.<br>2. Tabel <code>push_subscriptions</code> belum dimigrasi (<code>php artisan migrate</code>).<br>3. Config Laravel perlu di-clear (<code>php artisan config:clear</code>).</p>',
+                                    confirmButtonColor: '#2563eb'
+                                });
+                            }
                         } else {
                             Swal.fire({
                                 icon: 'info',
