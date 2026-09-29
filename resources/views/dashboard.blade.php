@@ -833,7 +833,10 @@
                     }
 
                     try {
-                        const reg = await navigator.serviceWorker.register('/sw.js');
+                        const reg = await navigator.serviceWorker.register('/sw.js?v=20260929_v3', { updateViaCache: 'none' });
+                        try {
+                            await reg.update();
+                        } catch (e) {}
                         const existingSub = await reg.pushManager.getSubscription();
 
                         if (Notification.permission === 'granted') {
@@ -1062,6 +1065,8 @@
                     }
                 },
 
+                lastPopupTime: 0,
+
                 initServiceWorkerMessageListener() {
                     if ('serviceWorker' in navigator) {
                         navigator.serviceWorker.addEventListener('message', (event) => {
@@ -1075,14 +1080,20 @@
                 checkUrlForNotificationPopup() {
                     const urlParams = new URLSearchParams(window.location.search);
                     if (urlParams.get('push_popup') === '1') {
-                        const title = urlParams.get('title') || '⏰ Pengingat Absensi';
+                        const title = urlParams.get('title') || '⏰ Pengingat Absensi!';
                         const body = urlParams.get('body') || 'Waktu absensi akan segera berakhir!';
-                        // Bersihkan parameter URL agar tidak muncul lagi saat halaman di-refresh
-                        const cleanUrl = window.location.pathname;
-                        window.history.replaceState({}, document.title, cleanUrl);
+                        
+                        // Bersihkan parameter query pop-up dari URL
+                        urlParams.delete('push_popup');
+                        urlParams.delete('title');
+                        urlParams.delete('body');
+                        urlParams.delete('_t');
+                        const newQuery = urlParams.toString() ? ('?' + urlParams.toString()) : '';
+                        window.history.replaceState({}, document.title, window.location.pathname + newQuery);
+
                         setTimeout(() => {
                             this.showReminderPopup(title, body);
-                        }, 500);
+                        }, 400);
                     }
                 },
 
@@ -1092,7 +1103,7 @@
                         if (!AudioContext) return;
                         const audioCtx = new AudioContext();
                         if (audioCtx.state === 'suspended') {
-                            audioCtx.resume();
+                            audioCtx.resume().catch(() => {});
                         }
                         
                         const now = audioCtx.currentTime;
@@ -1123,7 +1134,17 @@
                 },
 
                 showReminderPopup(title, body) {
+                    const now = Date.now();
+                    if (now - this.lastPopupTime < 3000) return;
+                    this.lastPopupTime = now;
+
                     this.playNotificationSound();
+
+                    if (typeof Swal === 'undefined') {
+                        alert((title || 'Pengingat Absensi') + '\n\n' + (body || 'Waktu absensi akan segera berakhir!'));
+                        return;
+                    }
+
                     Swal.fire({
                         icon: 'warning',
                         title: title || '⏰ Pengingat Absensi!',
@@ -1142,7 +1163,12 @@
                         cancelButtonText: 'Tutup',
                         cancelButtonColor: '#64748b',
                         focusConfirm: true,
-                        backdrop: 'rgba(15, 23, 42, 0.65)'
+                        backdrop: 'rgba(15, 23, 42, 0.75)',
+                        customClass: {
+                            popup: 'rounded-2xl',
+                            confirmButton: 'rounded-xl font-bold px-5 py-2.5 shadow-md',
+                            cancelButton: 'rounded-xl font-semibold px-4 py-2.5'
+                        }
                     }).then((result) => {
                         if (result.isConfirmed) {
                             const target = document.getElementById('webcam') || document.querySelector('button[type="submit"]');
