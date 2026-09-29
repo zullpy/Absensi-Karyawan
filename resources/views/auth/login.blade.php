@@ -5,6 +5,26 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="error-alert" role="alert">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/>
+            </svg>
+            <div>{{ session('error') }}</div>
+        </div>
+    @endif
+
+    @if (isset($errors) && $errors->has('login_failed'))
+        <div class="error-alert" role="alert">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/>
+            </svg>
+            <div>{{ $errors->first('login_failed') }}</div>
+        </div>
+    @endif
+
     <!-- Card Header -->
     <div class="card-header">
         <h1>Masuk ke akun Anda</h1>
@@ -16,7 +36,7 @@
 
         <!-- Username -->
         <div class="form-group">
-            <label for="username">Username</label>
+            <label for="username">Username atau No. HP</label>
             <div class="input-wrap">
                 <span class="input-icon">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -32,7 +52,7 @@
                     required
                     autofocus
                     autocomplete="username"
-                    class="form-input"
+                    class="form-input @error('username') is-invalid @enderror"
                 >
             </div>
             @error('username')
@@ -60,7 +80,7 @@
                     placeholder="Masukkan password"
                     required
                     autocomplete="current-password"
-                    class="form-input has-action"
+                    class="form-input has-action @error('password') is-invalid @enderror"
                 >
                 <button type="button" class="input-action" id="togglePassword" aria-label="Tampilkan password">
                     <svg id="eyeOpen" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">

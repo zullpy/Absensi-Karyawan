@@ -95,25 +95,11 @@
                             <div class="scanner-corner scanner-corner-br" :style="isFaceDetected ? 'border-color: #10b981 !important' : ''"></div>
 
                             <!-- Realtime Face Status HUD Badge -->
-                            <div x-show="cameraActive" class="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none transition-all">
-                                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-md backdrop-blur-md transition-colors"
+                            <div x-show="cameraActive" class="absolute top-3 left-5 right-5 z-20 flex items-center justify-between pointer-events-none transition-all">
+                                <div class="inline-flex items-center gap-1.5 px-3 ml-14 py-1.5 rounded-full text-xs font-bold shadow-md backdrop-blur-md transition-colors"
                                      :class="isFaceDetected ? 'bg-emerald-600/90 text-white' : 'bg-red-600/90 text-white'">
                                     <span class="w-2 h-2 rounded-full bg-white" :class="isFaceDetected ? 'animate-ping' : ''"></span>
                                     <span x-text="isFaceDetected ? 'Wajah Terdeteksi (Siap Absen)' : 'Wajah Belum Terdeteksi'"></span>
-                                </div>
-                            </div>
-
-                            <!-- Oval Face Guide Overlay -->
-                            <div x-show="cameraActive" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10">
-                                <div class="w-48 h-60 sm:w-52 sm:h-64 rounded-[50%] border-2 transition-all duration-300 flex items-end justify-center pb-3"
-                                     :class="isFaceDetected ? 'border-emerald-400 bg-emerald-500/10 shadow-[0_0_25px_rgba(16,185,129,0.35)]' : 'border-dashed border-white/60 bg-black/15'">
-                                    <span x-show="!isFaceDetected" class="text-[11px] font-semibold text-white bg-black/75 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs">
-                                        Posisikan Wajah Di Sini
-                                    </span>
-                                    <span x-show="isFaceDetected" class="text-[11px] font-bold text-emerald-200 bg-emerald-950/80 backdrop-blur-xs px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1">
-                                        <svg class="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                                        Wajah Siap
-                                    </span>
                                 </div>
                             </div>
 

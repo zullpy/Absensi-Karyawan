@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AttendanceController as AdminAttendanceController;
+use App\Http\Controllers\Admin\ExportController as AdminExportController;
+use App\Http\Controllers\Admin\LeaveController as AdminLeaveController;
 use App\Http\Controllers\Admin\Master\AdminController;
 use App\Http\Controllers\Admin\Master\DivisionController;
 use App\Http\Controllers\Admin\Master\OfficeSettingController;
@@ -68,13 +70,35 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         return view('admin.master.data-user');
     })->name('karyawan');
 
-    Route::get('/pengajuan-izin', function () {
-        return view('admin.pengajuan-izin');
-    })->name('pengajuan-izin');
+    // Pengajuan Izin
+    Route::get('/pengajuan-izin', [AdminLeaveController::class, 'index'])->name('pengajuan-izin');
+    Route::post('/pengajuan-izin/{leave}/approve', [AdminLeaveController::class, 'approve'])->name('pengajuan-izin.approve');
+    Route::post('/pengajuan-izin/{leave}/reject', [AdminLeaveController::class, 'reject'])->name('pengajuan-izin.reject');
+    Route::delete('/pengajuan-izin/{leave}', [AdminLeaveController::class, 'destroy'])->name('pengajuan-izin.destroy');
 
-    Route::get('/export', function () {
-        return view('admin.export');
-    })->name('export');
+    // Export & Unduh Laporan
+    Route::get('/export', [AdminExportController::class, 'index'])->name('export');
+    Route::prefix('export')->name('export.')->group(function () {
+        // AJAX Previews
+        Route::get('/absensi/preview', [AdminExportController::class, 'previewAbsensi'])->name('absensi.preview');
+        Route::get('/izin/preview', [AdminExportController::class, 'previewIzin'])->name('izin.preview');
+        Route::get('/rekap/preview', [AdminExportController::class, 'previewRekap'])->name('rekap.preview');
+
+        // Unduh Presensi
+        Route::get('/absensi/excel', [AdminExportController::class, 'exportAbsensiExcel'])->name('absensi.excel');
+        Route::get('/absensi/pdf', [AdminExportController::class, 'exportAbsensiPdf'])->name('absensi.pdf');
+        Route::get('/absensi/print', [AdminExportController::class, 'printAbsensi'])->name('absensi.print');
+
+        // Unduh Izin & Cuti
+        Route::get('/izin/excel', [AdminExportController::class, 'exportIzinExcel'])->name('izin.excel');
+        Route::get('/izin/pdf', [AdminExportController::class, 'exportIzinPdf'])->name('izin.pdf');
+        Route::get('/izin/print', [AdminExportController::class, 'printIzin'])->name('izin.print');
+
+        // Unduh Rekap Bulanan
+        Route::get('/rekap/excel', [AdminExportController::class, 'exportRekapExcel'])->name('rekap.excel');
+        Route::get('/rekap/pdf', [AdminExportController::class, 'exportRekapPdf'])->name('rekap.pdf');
+        Route::get('/rekap/print', [AdminExportController::class, 'printRekap'])->name('rekap.print');
+    });
 });
 
 require __DIR__.'/auth.php';

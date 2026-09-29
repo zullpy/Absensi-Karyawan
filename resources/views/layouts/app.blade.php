@@ -34,6 +34,119 @@
         <!-- SweetAlert2 -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+        <style>
+            /* Custom SweetAlert2 Theme for Light & Dark Mode */
+            .swal2-container {
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+            }
+            .swal2-popup {
+                border-radius: 1.25rem !important;
+                font-family: inherit !important;
+                padding: 1.75rem 1.5rem !important;
+            }
+            .swal2-title {
+                font-size: 1.15rem !important;
+                font-weight: 700 !important;
+                line-height: 1.4 !important;
+            }
+            .swal2-html-container {
+                font-size: 0.8125rem !important;
+                line-height: 1.5 !important;
+                margin-top: 0.5rem !important;
+            }
+            .swal2-actions {
+                gap: 0.5rem !important;
+                margin-top: 1.25rem !important;
+            }
+            .swal2-confirm, .swal2-cancel {
+                border-radius: 0.625rem !important;
+                font-size: 0.8125rem !important;
+                font-weight: 600 !important;
+                padding: 0.6rem 1.25rem !important;
+                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            }
+            
+            /* Dark Mode Overrides */
+            html.dark .swal2-popup {
+                background: #1e293b !important;
+                color: #f8fafc !important;
+                border: 1px solid #334155 !important;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+            }
+            html.dark .swal2-title {
+                color: #f8fafc !important;
+            }
+            html.dark .swal2-html-container {
+                color: #94a3b8 !important;
+            }
+            html.dark .swal2-close {
+                color: #94a3b8 !important;
+            }
+            html.dark .swal2-close:hover {
+                color: #f8fafc !important;
+            }
+            html.dark .swal2-cancel {
+                background-color: #334155 !important;
+                color: #e2e8f0 !important;
+                border: 1px solid #475569 !important;
+            }
+            html.dark .swal2-cancel:hover {
+                background-color: #475569 !important;
+            }
+            html.dark .swal2-input, html.dark .swal2-textarea {
+                background-color: #0f172a !important;
+                color: #f8fafc !important;
+                border: 1px solid #334155 !important;
+            }
+
+            /* SweetAlert2 Icon Enhancements in Dark Mode */
+            html.dark .swal2-icon.swal2-warning {
+                border-color: #f59e0b !important;
+                color: #f59e0b !important;
+            }
+            html.dark .swal2-icon.swal2-question {
+                border-color: #38bdf8 !important;
+                color: #38bdf8 !important;
+            }
+            html.dark .swal2-icon.swal2-success {
+                border-color: #10b981 !important;
+                color: #10b981 !important;
+            }
+            html.dark .swal2-icon.swal2-success [class^='swal2-success-line'] {
+                background-color: #10b981 !important;
+            }
+            html.dark .swal2-icon.swal2-success .swal2-success-ring {
+                border-color: rgba(16, 185, 129, 0.3) !important;
+            }
+            html.dark .swal2-icon.swal2-error {
+                border-color: #ef4444 !important;
+                color: #ef4444 !important;
+            }
+            html.dark .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+                background-color: #ef4444 !important;
+            }
+        </style>
+        <script>
+            // Automatically adapt SweetAlert2 parameters to active theme
+            (function() {
+                if (window.Swal) {
+                    const originalFire = Swal.fire.bind(Swal);
+                    Swal.fire = function(...args) {
+                        const isDark = document.documentElement.classList.contains('dark');
+                        if (args.length === 1 && typeof args[0] === 'object' && args[0] !== null) {
+                            if (!args[0].background) {
+                                args[0].background = isDark ? '#1e293b' : '#ffffff';
+                            }
+                            if (!args[0].color) {
+                                args[0].color = isDark ? '#f8fafc' : '#1e293b';
+                            }
+                        }
+                        return originalFire(...args);
+                    };
+                }
+            })();
+        </script>
 
         <!-- Cropper.js for Profile Photo Editor -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">

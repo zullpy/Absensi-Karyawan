@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -40,14 +41,14 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'username.required' => 'Username wajib diisi.',
+            'username.required' => 'Username atau nomor HP wajib diisi.',
             'password.required' => 'Password wajib diisi.',
         ];
     }
 
     /**
      * Attempt to authenticate the request's credentials.
-     * Try login by username first, then by no_hp.
+     * Differentiate between wrong password, wrong username/no_hp, or both wrong.
      *
      * @throws ValidationException
      */
@@ -58,29 +59,49 @@ class LoginRequest extends FormRequest
         $username = $this->string('username')->value();
         $password = $this->string('password')->value();
 
-        // Coba login via kolom `username`
-        $authenticated = Auth::attempt(
-            ['username' => $username, 'password' => $password],
-            $this->boolean('remember')
-        );
+        // 1. Cari user berdasarkan username atau no_hp
+        $user = User::where('username', $username)
+                    ->orWhere('no_hp', $username)
+                    ->first();
 
-        // Jika gagal, coba via kolom `no_hp`
-        if (! $authenticated) {
-            $authenticated = Auth::attempt(
-                ['no_hp' => $username, 'password' => $password],
-                $this->boolean('remember')
-            );
-        }
+        if ($user) {
+            // User ditemukan, cek kecocokan password
+            if (Hash::check($password, $user->password)) {
+                Auth::login($user, $this->boolean('remember'));
+                RateLimiter::clear($this->throttleKey());
+                return;
+            }
 
-        if (! $authenticated) {
+            // User benar, tetapi password salah
             RateLimiter::hit($this->throttleKey());
-
             throw ValidationException::withMessages([
-                'username' => __('auth.failed'),
+                'login_failed' => 'Kata sandi salah.',
+                'password' => 'Kata sandi yang Anda masukkan salah.',
             ]);
         }
 
-        RateLimiter::clear($this->throttleKey());
+        // 2. User tidak ditemukan di database
+        RateLimiter::hit($this->throttleKey());
+
+        // Cek apakah password cocok dengan salah satu akun yang ada di sistem
+        $passwordMatchesAny = User::all()->contains(function ($u) use ($password) {
+            return Hash::check($password, $u->password);
+        });
+
+        if ($passwordMatchesAny) {
+            // Password cocok dengan akun lain, berarti hanya username/no_hp yang salah
+            throw ValidationException::withMessages([
+                'login_failed' => 'Username atau nomor HP salah.',
+                'username' => 'Username atau nomor HP tidak terdaftar.',
+            ]);
+        }
+
+        // 3. Keduanya salah (Username/no HP tidak terdaftar dan password juga tidak cocok dengan akun manapun)
+        throw ValidationException::withMessages([
+            'login_failed' => 'Username/nomor HP dan kata sandi salah.',
+            'username' => 'Username atau nomor HP salah.',
+            'password' => 'Kata sandi salah.',
+        ]);
     }
 
     /**
