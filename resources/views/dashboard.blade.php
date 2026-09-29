@@ -358,6 +358,8 @@
                 init() {
                     this.initLiveClock();
                     this.initPushNotification();
+                    this.initServiceWorkerMessageListener();
+                    this.checkUrlForNotificationPopup();
                     this.initCamera();
                     this.initGeolocation();
                     this.$nextTick(() => {
@@ -1045,12 +1047,11 @@
                         });
                         const res = await response.json();
                         if (res.success) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Notifikasi Uji Coba Terkirim!',
-                                text: 'Periksa bilah notifikasi HP / Laptop Anda. Anda juga bisa mencoba menutup Chrome dan mengirim tes untuk melihat notifikasi tetap masuk.',
-                                confirmButtonColor: '#2563eb'
-                            });
+                            // Tampilkan langsung pop-up modal di layar
+                            this.showReminderPopup(
+                                '🔔 Tes Pengingat Absensi!',
+                                'Notifikasi uji coba berhasil dikirim! Pop-up ini otomatis muncul di layar dan di bilah notifikasi sistem HP / Laptop Anda.'
+                            );
                         } else {
                             Swal.fire('Gagal', res.message, 'error');
                         }
@@ -1059,6 +1060,97 @@
                     } finally {
                         this.sendingTest = false;
                     }
+                },
+
+                initServiceWorkerMessageListener() {
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.addEventListener('message', (event) => {
+                            if (event.data && (event.data.type === 'PUSH_NOTIFICATION_RECEIVED' || event.data.type === 'PUSH_NOTIFICATION_CLICKED')) {
+                                this.showReminderPopup(event.data.title, event.data.body);
+                            }
+                        });
+                    }
+                },
+
+                checkUrlForNotificationPopup() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get('push_popup') === '1') {
+                        const title = urlParams.get('title') || '⏰ Pengingat Absensi';
+                        const body = urlParams.get('body') || 'Waktu absensi akan segera berakhir!';
+                        // Bersihkan parameter URL agar tidak muncul lagi saat halaman di-refresh
+                        const cleanUrl = window.location.pathname;
+                        window.history.replaceState({}, document.title, cleanUrl);
+                        setTimeout(() => {
+                            this.showReminderPopup(title, body);
+                        }, 500);
+                    }
+                },
+
+                playNotificationSound() {
+                    try {
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        if (!AudioContext) return;
+                        const audioCtx = new AudioContext();
+                        if (audioCtx.state === 'suspended') {
+                            audioCtx.resume();
+                        }
+                        
+                        const now = audioCtx.currentTime;
+                        // Nada 1 (D5)
+                        const osc1 = audioCtx.createOscillator();
+                        const gain1 = audioCtx.createGain();
+                        osc1.type = 'sine';
+                        osc1.frequency.setValueAtTime(587.33, now);
+                        gain1.gain.setValueAtTime(0.25, now);
+                        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+                        osc1.connect(gain1);
+                        gain1.connect(audioCtx.destination);
+                        osc1.start(now);
+                        osc1.stop(now + 0.3);
+
+                        // Nada 2 (A5)
+                        const osc2 = audioCtx.createOscillator();
+                        const gain2 = audioCtx.createGain();
+                        osc2.type = 'sine';
+                        osc2.frequency.setValueAtTime(880, now + 0.15);
+                        gain2.gain.setValueAtTime(0.3, now + 0.15);
+                        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+                        osc2.connect(gain2);
+                        gain2.connect(audioCtx.destination);
+                        osc2.start(now + 0.15);
+                        osc2.stop(now + 0.55);
+                    } catch(e) {}
+                },
+
+                showReminderPopup(title, body) {
+                    this.playNotificationSound();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: title || '⏰ Pengingat Absensi!',
+                        html: `
+                            <div class="py-2 text-center">
+                                <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">${body || 'Waktu absensi akan segera berakhir. Segera lakukan presensi!'}</p>
+                                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-bold">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                                    <span>Waktu Sekarang: ${this.liveClockWib || ''} WIB</span>
+                                </div>
+                            </div>
+                        `,
+                        confirmButtonText: '📸 Absen Sekarang',
+                        confirmButtonColor: '#2563eb',
+                        showCancelButton: true,
+                        cancelButtonText: 'Tutup',
+                        cancelButtonColor: '#64748b',
+                        focusConfirm: true,
+                        backdrop: 'rgba(15, 23, 42, 0.65)'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const target = document.getElementById('webcam') || document.querySelector('button[type="submit"]');
+                            if (target) {
+                                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        }
+                    });
                 }
             };
         }
